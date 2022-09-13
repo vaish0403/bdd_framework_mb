@@ -1,7 +1,8 @@
-using NUnit.Framework;
-using OpenQA.Selenium;
-using Specflow_Automation.Hooks;
 using System;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
+using Specflow_Automation.Hooks;
 using TechTalk.SpecFlow;
 
 namespace Specflow_Automation.StepDefinitions
@@ -9,40 +10,54 @@ namespace Specflow_Automation.StepDefinitions
     [Binding]
     public class EmployeeStepDefinitions
     {
-        [When(@"I click on PIM")]
-        public void WhenIClickOnPIM()
+        private string firstName = string.Empty;
+        private string middleName = string.Empty;
+        private string lastName = string.Empty;
+
+        [When(@"I click on PIM menu")]
+        public void WhenIClickOnPIMMenu()
         {
+            AutomationHooks.driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
             AutomationHooks.driver.FindElement(By.XPath("//span[text()='PIM']")).Click();
         }
 
-        [When(@"I click on Add Employee")]
+        [When(@"I click on Add employee")]
         public void WhenIClickOnAddEmployee()
         {
-            AutomationHooks.driver.FindElement(By.XPath("//a[text()='Add Employee']")).Click();
+            AutomationHooks.driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
+            AutomationHooks.driver.FindElement(By.XPath("//button[text()=' Add ']")).Click();
         }
 
-        [When(@"I add all details")]
-        public void WhenIAddAllDetails(Table table)
+        [When(@"I fill the add employee section")]
+        public void WhenIFillTheAddEmployeeSection(Table table)
         {
+            AutomationHooks.driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(20);
 
-            string fName = table.Rows[0]["firstname"];
-            string mName = table.Rows[0]["middle_name"];
-            string lName = table.Rows[0]["last_name"];
-            string toggleLoginDetai = table.Rows[0]["toggle_login_details"];
-            string UserName = table.Rows[0]["username"];
-            string password = table.Rows[0]["password"];
-            string confirmPassword = table.Rows[0]["confirm_password"];
-            string status = table.Rows[0]["status"];
-            AutomationHooks.driver.FindElement(By.Name("firstName")).SendKeys(fName);
-            AutomationHooks.driver.FindElement(By.Name("middleName")).SendKeys(mName);
-            AutomationHooks.driver.FindElement(By.Name("lastName")).SendKeys(lName);
+            table.Rows.ElementAt(0).TryGetValue("firstname", out firstName);
+            table.Rows.ElementAt(0).TryGetValue("middlename", out middleName);
+            table.Rows.ElementAt(0).TryGetValue("lastname", out lastName);
+            table.Rows.ElementAt(0).TryGetValue("employee_id", out string employee_id);
+            table.Rows.ElementAt(0).TryGetValue("toggle_login_detail", out string toggle_login_detail);
+            table.Rows.ElementAt(0).TryGetValue("username", out string username);
+            table.Rows.ElementAt(0).TryGetValue("password", out string password);
+            table.Rows.ElementAt(0).TryGetValue("confirm_password", out string confirm_password);
+            table.Rows.ElementAt(0).TryGetValue("status", out string status);
 
-            if (toggleLoginDetai.Equals("on"))
+            AutomationHooks.driver.FindElement(By.XPath("//input[@name='firstName']")).SendKeys(firstName);
+            AutomationHooks.driver.FindElement(By.XPath("//input[@name='middleName']")).SendKeys(middleName);
+            AutomationHooks.driver.FindElement(By.XPath("//input[@name='lastName']")).SendKeys(lastName);
+
+            if (toggle_login_detail == "on")
             {
-                AutomationHooks.driver.FindElement(By.XPath("//span[contains(@class,'oxd-switch-input')]")).Click();
-                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Username')]/following::input")).SendKeys(UserName);
-                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Password')]/following::input")).SendKeys(password);
-                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Confirm Password')]/following::input")).SendKeys(confirmPassword);
+                AutomationHooks.driver.FindElement(By.XPath("//span[contains(@class, 'oxd-switch-input')]")).Click();
+
+                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Username')]/following::input"))
+                    .SendKeys(username);
+                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Password')]/following::input"))
+                    .SendKeys(password);
+                AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Confirm Password')]/following::input"))
+                    .SendKeys(confirm_password);
+
                 if (status.ToLower().Equals("disabled"))
                 {
                     AutomationHooks.driver.FindElement(By.XPath("//label[text()='Disabled']")).Click();
@@ -53,17 +68,24 @@ namespace Specflow_Automation.StepDefinitions
                 }
             }
         }
-        [When(@"I click on save option")]
-        public void WhenIClickOnSaveOption()
-        {
-            AutomationHooks.driver.FindElement(By.XPath("//button[@type='submit']")).Click();
 
+        [When(@"I click on save")]
+        public void WhenIClickOnSave()
+        {
+            AutomationHooks.driver.FindElement(By.XPath("//button[text()=' Save ']")).Click();
         }
-        [Then(@"I should navigate to personal details")]
-        public void ThenIShouldNavigateToPersonalDetails()
+
+        [Then(@"I should be navigated to personal details section with added employee records\.")]
+        public void ThenIShouldBeNavigatedToPersonalDetailsSectionWithAddedEmployeeRecords_()
         {
             string actualFirstName = AutomationHooks.driver.FindElement(By.Name("firstName")).GetAttribute("value");
-            Assert.AreEqual("vaishnavi", actualFirstName);
+            Assert.Equal(firstName, actualFirstName);
+
+            string actualMiddleName = AutomationHooks.driver.FindElement(By.Name("middleName")).GetAttribute("value");
+            Assert.Equal(middleName, actualMiddleName);
+
+            string actualLastName = AutomationHooks.driver.FindElement(By.Name("lastName")).GetAttribute("value");
+            Assert.Equal(lastName, actualLastName);
         }
     }
 }
