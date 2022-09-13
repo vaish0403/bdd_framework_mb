@@ -1,11 +1,18 @@
-﻿using OpenQA.Selenium;
+using OpenQA.Selenium;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Specflow_Automation.Hooks
 {
     [Binding]
     public class AutomationHooks
     {
-      public static IWebDriver driver;
+        public IWebDriver driver;
+
         [AfterScenario]
         public void EndScenario()
         {
@@ -14,5 +21,6 @@ namespace Specflow_Automation.Hooks
                 driver.Quit();
             }
         }
+
     }
 }
