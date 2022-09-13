@@ -1,24 +1,23 @@
-using NUnit.Framework;
 using OpenQA.Selenium;
 using Specflow_Automation.Hooks;
 using System;
 using TechTalk.SpecFlow;
 
-namespace SpecFlowProject1.StepDefinitions
+namespace Specflow_Automation.StepDefinitions
 {
     [Binding]
-    public class Employee_ContactStepDefinitions
+    public class EmergencyContactsStepDefinitions
     {
         private string name = string.Empty;
         private string relationship = string.Empty;
         private string home_telephone = string.Empty;
         private string mobile = string.Empty;
         private string work_telephone = string.Empty;
+
         [When(@"I click on My Info")]
         public void WhenIClickOnMyInfo()
         {
             AutomationHooks.driver.FindElement(By.XPath("//span[text()='My Info']")).Click();
-
         }
 
         [When(@"I click on Emergency Contacts")]
@@ -27,21 +26,21 @@ namespace SpecFlowProject1.StepDefinitions
             AutomationHooks.driver.FindElement(By.XPath("//a[text()='Emergency Contacts']")).Click();
         }
 
-        [When(@"I click on Add")]
-        public void WhenIClickOnAdd()
+        [When(@"I click on Add Emergency Contact")]
+        public void WhenIClickOnAddEmergencyContact()
         {
             AutomationHooks.driver.FindElement(By.XPath("//button[text()=' Add ']")).Click();
-
         }
 
-        [When(@"I click on emergency contact")]
-        public void WhenIClickOnEmergencyContact(Table table)
+        [When(@"I fill the Add Emergency Contact section")]
+        public void WhenIFillTheAddEmergencyContactSection(Table table)
         {
             table.Rows.ElementAt(0).TryGetValue("name", out name);
             table.Rows.ElementAt(0).TryGetValue("relationship", out relationship);
             table.Rows.ElementAt(0).TryGetValue("home_telephone", out home_telephone);
             table.Rows.ElementAt(0).TryGetValue("mobile", out mobile);
             table.Rows.ElementAt(0).TryGetValue("work_telephone", out work_telephone);
+
             AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Name')]/following::input"))
                 .SendKeys(name);
             AutomationHooks.driver.FindElement(By.XPath("//label[contains(text(),'Relationship')]/following::input"))
@@ -54,14 +53,8 @@ namespace SpecFlowProject1.StepDefinitions
                 .SendKeys(work_telephone);
         }
 
-        [When(@"I click on save")]
-        public void WhenIClickOnSave()
-        {
-            AutomationHooks.driver.FindElement(By.XPath("//button[@type='submit']")).Click();
-        }
-
-        [Then(@"I should navigate to emergency conact details")]
-        public void ThenIShouldNavigateToEmergencyConactDetails()
+        [Then(@"I should be navigated to Assigned Emergency Contacts section with added Emergency Contacts\.")]
+        public void ThenIShouldBeNavigatedToAssignedEmergencyContactsSectionWithAddedEmergencyContacts_()
         {
             var actualName = AutomationHooks.driver.FindElement(By.XPath($"//div[contains(text(),'{name}')]"));
             Assert.NotNull(actualName);
